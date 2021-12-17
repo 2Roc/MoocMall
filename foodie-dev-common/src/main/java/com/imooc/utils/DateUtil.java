@@ -44,10 +44,7 @@ public class DateUtil {
     }
 
     protected static final float normalizedJulian(float JD) {
-
-        float f = Math.round(JD + 0.5f) - 0.5f;
-
-        return f;
+        return Math.round(JD + 0.5f) - 0.5f;
     }
 
     /**

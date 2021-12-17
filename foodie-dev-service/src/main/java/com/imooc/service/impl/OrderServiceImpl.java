@@ -188,7 +188,6 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void closeOrder() {
-
         // 查询所有未付款订单，判断时间是否超时（1天），超时则关闭交易
         OrderStatus queryOrder = new OrderStatus();
         queryOrder.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);

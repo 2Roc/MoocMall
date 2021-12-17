@@ -41,7 +41,7 @@ public class ShopcatController extends BaseController {
         // 前端用户在登录的情况下，添加商品到购物车，会同时在后端同步购物车到redis缓存
         // 需要判断当前购物车中包含已经存在的商品，如果存在则累加购买数量
         String shopcartJson = redisOperator.get(FOODIE_SHOPCART + ":" + userId);
-        List<ShopcartBO> shopcartList = null;
+        List<ShopcartBO> shopcartList;
         if (StringUtils.isNotBlank(shopcartJson)) {
             // redis中已经有购物车了
             shopcartList = JsonUtils.jsonToList(shopcartJson, ShopcartBO.class);

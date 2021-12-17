@@ -83,9 +83,9 @@ public final class CookieUtils {
         }
         String retValue = null;
         try {
-            for (int i = 0; i < cookieList.length; i++) {
-                if (cookieList[i].getName().equals(cookieName)) {
-                    retValue = URLDecoder.decode(cookieList[i].getValue(), encodeString);
+            for (Cookie cookie : cookieList) {
+                if (cookie.getName().equals(cookieName)) {
+                    retValue = URLDecoder.decode(cookie.getValue(), encodeString);
                     break;
                 }
             }
@@ -205,7 +205,8 @@ public final class CookieUtils {
             Cookie cookie = new Cookie(cookieName, cookieValue);
             if (cookieMaxage > 0)
                 cookie.setMaxAge(cookieMaxage);
-            if (null != request) {// 设置域名的cookie
+            if (null != request) {
+                // 设置域名的cookie
             	String domainName = getDomainName(request);
                 logger.info("========== domainName: {} ==========", domainName);
                 if (!"localhost".equals(domainName)) {
@@ -229,8 +230,8 @@ public final class CookieUtils {
      * @param cookieMaxage	cookie生效的最大秒数
      * @param encodeString
      */
-    private static final void doSetCookie(HttpServletRequest request, HttpServletResponse response,
-            String cookieName, String cookieValue, int cookieMaxage, String encodeString) {
+    private static void doSetCookie(HttpServletRequest request, HttpServletResponse response,
+                                    String cookieName, String cookieValue, int cookieMaxage, String encodeString) {
         try {
             if (cookieValue == null) {
                 cookieValue = "";
@@ -263,7 +264,7 @@ public final class CookieUtils {
         String domainName = null;
 
         String serverName = request.getRequestURL().toString();
-        if (serverName == null || serverName.equals("")) {
+        if ("".equals(serverName)) {
             domainName = "";
         } else {
             serverName = serverName.toLowerCase();
@@ -290,9 +291,10 @@ public final class CookieUtils {
         return domainName;
     }
     
-    public static String trimSpaces(String IP){//去掉IP字符串前后所有的空格  
+    public static String trimSpaces(String IP){
+        //去掉IP字符串前后所有的空格
         while(IP.startsWith(" ")){  
-               IP= IP.substring(1,IP.length()).trim();  
+               IP= IP.substring(1).trim();
             }  
         while(IP.endsWith(" ")){  
                IP= IP.substring(0,IP.length()-1).trim();  
@@ -304,7 +306,7 @@ public final class CookieUtils {
         boolean b = false;  
         IP = trimSpaces(IP);  
         if(IP.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")){  
-            String s[] = IP.split("\\.");  
+            String[] s = IP.split("\\.");
             if(Integer.parseInt(s[0])<255)  
                 if(Integer.parseInt(s[1])<255)  
                     if(Integer.parseInt(s[2])<255)  

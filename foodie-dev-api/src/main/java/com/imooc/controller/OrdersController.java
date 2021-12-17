@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,8 +49,8 @@ public class OrdersController extends BaseController {
             HttpServletRequest request,
             HttpServletResponse response) {
 
-        if (submitOrderBO.getPayMethod() != PayMethod.WEIXIN.type
-            && submitOrderBO.getPayMethod() != PayMethod.ALIPAY.type ) {
+        if (!submitOrderBO.getPayMethod().equals(PayMethod.WEIXIN.type)
+            && !submitOrderBO.getPayMethod().equals(PayMethod.ALIPAY.type)) {
             return IMOOCJSONResult.errorMsg("支付方式不支持！");
         }
 
@@ -67,13 +68,14 @@ public class OrdersController extends BaseController {
         String orderId = orderVO.getOrderId();
 
         // 2. 创建订单以后，移除购物车中已结算（已提交）的商品
-        /**
+        /*
          * 1001
          * 2002 -> 用户购买
          * 3003 -> 用户购买
          * 4004
          */
         // 清理覆盖现有的redis汇总的购物数据
+        Assert.notNull(shopcartList,"shopcartList is null");
         shopcartList.removeAll(orderVO.getToBeRemovedShopcatdList());
         redisOperator.set(FOODIE_SHOPCART + ":" + submitOrderBO.getUserId(), JsonUtils.objectToJson(shopcartList));
         // 整合redis之后，完善购物车中的已结算商品清除，并且同步到前端的cookie
@@ -99,7 +101,8 @@ public class OrdersController extends BaseController {
                                             entity,
                                             IMOOCJSONResult.class);
         IMOOCJSONResult paymentResult = responseEntity.getBody();
-        if (paymentResult.getStatus() != 200) {
+        Assert.notNull(paymentResult,"paymentResult is null");
+        if (paymentResult.getStatus() != HttpStatus.OK.value()) {
             logger.error("发送错误：{}", paymentResult.getMsg());
             return IMOOCJSONResult.errorMsg("支付中心订单创建失败，请联系管理员！");
         }
